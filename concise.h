@@ -116,8 +116,8 @@ public:
 private:
     T v;
     Class& c;
-    func g;
-    del d;
+    const func g;
+    const del d;
 };
 
 template <typename Class, typename T>
@@ -158,8 +158,8 @@ public:
 private:
     T v;
     Class& c;
-    func g, s;
-    del d;
+    const func g, s;
+    const del d;
 };
 
 template <typename... T>
