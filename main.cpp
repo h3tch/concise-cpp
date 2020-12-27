@@ -2,41 +2,51 @@
 
 #include "concise.h"
 
+namespace {
+
 template <tn T>
-auto add(fix T a, fix T b) -> T
-{
+auto add(fix T& a, fix T& b) -> T {
   var c = a + b;
   return c;
 }
 
-auto addi(fix i32 a, fix i32 b) -> i32
-{
-    return a + b;
-}
+}  // namespace
+
+auto addi(fix i32 a, fix i32 b) -> i32 { return a + b; }
 
 class Class {
-public:
-    Class(fix i32 a_, fix i32 b_, fix i32 c_)
-        : a(me, a_, [](Class& self, fix i32& v) -> fix i32 { return v + self.c; })
-        , b(me, b_, [](Class& self, fix i32& v) -> fix i32 { return v - self.c; })
-        , c(c_)
-    {}
-    getter<Class, i32> a;
-    getset<Class, i32> b;
+ public:
+  getter<Class, i32> a;
+  getset<Class, i32> b;
 
-    virtual auto function(fix i32 a) -> bool { return a % 2 == 0; }
+  Class(fix i32 a_, fix i32 b_, fix i32 c_)
+      : a(me, a_,
+          [](Class& self, fix i32& v) -> fix i32 { return v + self.c; }),
+        b(me, b_,
+          [](Class& self, fix i32& v) -> fix i32 { return v - self.c; }),
+        c(c_) {}
 
-private:
-    i32 c;
+  sta auto static_method() -> i32 { return cast<i32>(32f); }
+
+  dyn auto method() fix -> i32 { return c; }
+
+  dyn auto pureVirtual() fix -> f32 = 0;
+
+ private:
+  i32 c;
 };
 
-class Class2 : public Class {
-public:
-    auto function(fix i32 a) -> bool final override { return a % 2 == 1; }
+class Derived : public Class {
+ public:
+  exp Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
+
+  auto method() fix -> i32 final { return 64; }
+
+  auto pureVirtual() fix -> f32 final { return 128f; }
 };
 
 auto main() -> int {
-  mut c = Class{1, 2, 5};
+  mut c = Derived{1, 2, 5};
   var a = c.a;
   var b = c.b;
   c.b = 3;
@@ -50,8 +60,8 @@ auto main() -> int {
     println("Continue");
 
   var tup = tuple{1i, 1.2l, "test"s};
-  var unique_values = hashset<i32>{1, 2, 3};
-  var basic_map = hashmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
+  var uniqueValues = hashset<i32>{1, 2, 3};
+  var basicMap = hashmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
   var listi = array{1, 2, 3};
   var listj = array{1, 2, 3};
   var listk = vector{1, 2, 3};
@@ -69,18 +79,16 @@ auto main() -> int {
   var position = 123z;
 
   println("Tuple: ", tup);
-  println("Set: ", unique_values);
-  println("Map: ", basic_map);
+  println("Set: ", uniqueValues);
+  println("Map: ", basicMap);
   println("Array: ", listi);
   println("Vector: ", listk);
 
-  for (var[i, j, k] : zip(listi, listj, listk)) {
+  for (var[i, j, k] : zip(listi, listj, listk))
     println(i, ", ", j, ", ", k);
-  }
 
-  for (var[pos, i, j, k] : ezip(listi, listj, listk)) {
+  for (var[pos, i, j, k] : ezip(listi, listj, listk))
     println("At position ", pos, ": ", i, ", ", j, ", ", k);
-  }
 
   return 0;
 }

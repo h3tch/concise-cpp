@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <stdexcept>
 
 #define tn typename
 #define mut auto
@@ -22,6 +23,14 @@
 #define fix const
 #define me (*this)
 #define ef else if
+#define dyn virtual
+#define sta static
+#define cast static_cast
+#define dcast dynamic_cast
+#define rcast reinterpret_cast
+#define exp explicit
+#define imp implicit
+#define noex noexcpet
 
 using i8 = int8_t;
 using i16 = int16_t;
@@ -34,6 +43,7 @@ using u64 = uint64_t;
 using f32 = float;
 using f64 = double;
 using f128 = long double;
+using std::move;
 using std::array;
 using std::map;
 using std::set;
@@ -51,6 +61,13 @@ template <typename Key,
           typename KeyEqual = std::equal_to<Key>,
           typename Allocator = std::allocator<Key>>
 using hashset = std::unordered_set<Key, Hash, KeyEqual, Allocator>;
+using RuntimeError = std::runtime_error;
+using InvalidArg = std::invalid_argument;
+using OutOfRange = std::out_of_range;
+using DomainError = std::domain_error;
+using RangeError = std::range_error;
+using LengthError = std::length_error;
+using LogicError = std::logic_error;
 
 template <typename T>
 using ptr = std::shared_ptr<T>;
