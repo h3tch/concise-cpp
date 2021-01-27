@@ -50,6 +50,7 @@ auto main() -> int {
   c.b = 3;
   val d = c.b;
   decl(d)::type e = 6;
+  var& c2 = dcast<Class&>(c);
 
   val p = uptr<int>(123);
   val q = sptr<int>(234);
