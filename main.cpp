@@ -1,20 +1,21 @@
-#include <iostream>
-
 #include "concise.h"
 
 namespace {
 
 template <tn T>
-auto add(fix T& a, fix T& b) -> T {
-  var c = a + b;
+auto inl add(fix T& a, fix T& b) -> T {
+  val c = a + b;
   return c;
 }
 
 }  // namespace
 
-auto addi(fix i32 a, fix i32 b) -> i32 { return a + b; }
+auto cexpr addi(fix i32 a, fix i32 b) -> i32 { return a + b; }
 
 class Class {
+ private:
+  i32 c;
+
  public:
   getter<Class, i32> a;
   getset<Class, i32> b;
@@ -26,14 +27,11 @@ class Class {
           [](Class& self, fix i32& v) -> fix i32 { return v - self.c; }),
         c(c_) {}
 
-  sta auto static_method() -> i32 { return cast<i32>(32f); }
+  auto sta static_method() -> i32 { return cast<i32>(32f); }
 
-  dyn auto method() fix -> i32 { return c; }
+  auto dyn method() fix -> i32 { return c; }
 
-  dyn auto pureVirtual() fix -> f32 = 0;
-
- private:
-  i32 c;
+  auto dyn pureVirtual() fix -> f32 = 0;
 };
 
 class Derived : public Class {
@@ -46,11 +44,17 @@ class Derived : public Class {
 };
 
 auto main() -> int {
-  mut c = Derived{1, 2, 5};
-  var a = c.a;
-  var b = c.b;
+  var c = Derived{1, 2, 5};
+  val a = c.a;
+  val b = c.b;
   c.b = 3;
-  var d = c.b;
+  val d = c.b;
+  decl(d)::type e = 6;
+
+  val p = uptr<int>(123);
+  val q = sptr<int>(234);
+  val [m, n] = tup{1, 2};
+  val [s, t] = tup{arr{1, 2}, vec{3, 4}};
 
   if (d == 2)
     return 1;
@@ -59,35 +63,35 @@ auto main() -> int {
   else
     println("Continue");
 
-  var tup = tuple{1i, 1.2l, "test"s};
-  var uniqueValues = hashset<i32>{1, 2, 3};
-  var basicMap = hashmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
-  var listi = array{1, 2, 3};
-  var listj = array{1, 2, 3};
-  var listk = vector{1, 2, 3};
-  var string = "This is a string"s;
+  val tuple = tup{1i, 1.2l, "test"s};
+  val uniqueValues = hset{1, 2, 3};
+  val basicMap = hmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
+  val listi = arr{1, 2, 3};
+  val listj = arr{1, 2, 3};
+  val listk = vec{1, 2, 3};
+  val string = "This is a string"s;
 
-  var s2 = 123s;
+  val s2 = 123s;
 
-  var i1 = 123i;
-  var i2 = 123l;
+  val i1 = 123i;
+  val i2 = 123l;
 
-  var f1 = 123f;
-  var f2 = 123.0f;
-  var f3 = 123.0;
-  var f4 = 123.0l;
-  var position = 123z;
+  val f1 = 123f;
+  val f2 = 123.0f;
+  val f3 = 354'123.0;
+  val f4 = 123.0l;
+  val position = 123z;
 
-  println("Tuple: ", tup);
+  println("Tuple: ", tuple);
   println("Set: ", uniqueValues);
   println("Map: ", basicMap);
   println("Array: ", listi);
   println("Vector: ", listk);
+  println("Nested: ", tup{arr{1, 2, 3}, vec{4, 5, 6}});
 
-  for (var[i, j, k] : zip(listi, listj, listk))
-    println(i, ", ", j, ", ", k);
+  for (val[i, j, k] : zip(listi, listj, listk)) println(i, ", ", j, ", ", k);
 
-  for (var[pos, i, j, k] : ezip(listi, listj, listk))
+  for (val[pos, i, j, k] : ezip(listi, listj, listk))
     println("At position ", pos, ": ", i, ", ", j, ", ", k);
 
   return 0;
