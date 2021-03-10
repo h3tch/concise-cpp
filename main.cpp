@@ -6,7 +6,7 @@ namespace {
 
 template <tn T>
 auto add(fix T& a, fix T& b) -> T {
-  var c = a + b;
+  val c = a + b;
   return c;
 }
 
@@ -38,19 +38,19 @@ class Class {
 
 class Derived : public Class {
  public:
-  exp Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
+  expl Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
 
-  auto method() fix -> i32 final { return 64; }
+  auto method() fix -> i32 override final { return 64; }
 
-  auto pureVirtual() fix -> f32 final { return 128f; }
+  auto pureVirtual() fix -> f32 override final { return 128f; }
 };
 
 auto main() -> int {
-  mut c = Derived{1, 2, 5};
-  var a = c.a;
-  var b = c.b;
+  var c = Derived{1, 2, 5};
+  val a = c.a;
+  val b = c.b;
   c.b = 3;
-  var d = c.b;
+  val d = c.b;
 
   if (d == 2)
     return 1;
@@ -59,24 +59,24 @@ auto main() -> int {
   else
     println("Continue");
 
-  var tup = tuple{1i, 1.2l, "test"s};
-  var uniqueValues = hashset<i32>{1, 2, 3};
-  var basicMap = hashmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
-  var listi = array{1, 2, 3};
-  var listj = array{1, 2, 3};
-  var listk = vector{1, 2, 3};
-  var string = "This is a string"s;
+  val tup = tuple{1i, 1.2l, "test"s};
+  val uniqueValues = hashset<i32>{1, 2, 3};
+  val basicMap = hashmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
+  val listi = array{1, 2, 3};
+  val listj = array{1, 2, 3};
+  val listk = vector{1, 2, 3};
+  val string = "This is a string"s;
 
-  var s2 = 123s;
+  val s2 = 123s;
 
-  var i1 = 123i;
-  var i2 = 123l;
+  val i1 = 123i;
+  val i2 = 123l;
 
-  var f1 = 123f;
-  var f2 = 123.0f;
-  var f3 = 123.0;
-  var f4 = 123.0l;
-  var position = 123z;
+  val f1 = 123f;
+  val f2 = 123.0f;
+  val f3 = 123.0;
+  val f4 = 123.0l;
+  val position = 123z;
 
   println("Tuple: ", tup);
   println("Set: ", uniqueValues);
@@ -84,11 +84,29 @@ auto main() -> int {
   println("Array: ", listi);
   println("Vector: ", listk);
 
-  for (var[i, j, k] : zip(listi, listj, listk))
+  for (val[i, j, k] : zip(listi, listj, listk))
     println(i, ", ", j, ", ", k);
 
-  for (var[pos, i, j, k] : ezip(listi, listj, listk))
+  for (val[pos, i, j, k] : ezip(listi, listj, listk))
     println("At position ", pos, ": ", i, ", ", j, ", ", k);
+
+  for (val[pos, i] : enumerate(listi))
+    println("Enumerate position ", pos, ": ", i);
+
+  val d_string = std::invoke(
+      [](val& a) {
+        switch (a) {
+          case 1:
+            return "one";
+          case 2:
+            return "tow";
+          default:
+            return "unknown";
+        }
+      },
+      d);
+    
+  println("d as string: ", d, " -> ", d_string);
 
   return 0;
 }
