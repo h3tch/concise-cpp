@@ -1,4 +1,5 @@
 #pragma once
+#pragma GCC diagnostic error "-Wswitch"
 #include <assert.h>
 #include <inttypes.h>
 
@@ -31,6 +32,8 @@
 #define expl explicit
 #define impl implicit
 #define noex noexcpet
+#define sub constexpr
+#define eval decltype
 
 using i8 = int8_t;
 using i16 = int16_t;
@@ -480,17 +483,17 @@ class const_enumerated_zip_iterator {
 };
 
 template <typename... T>
-auto ezip(T&... container) -> enumerated_zip_iterator<T...> {
+auto izip(T&... container) -> enumerated_zip_iterator<T...> {
   return enumerated_zip_iterator<T...>(container...);
 }
 
 template <typename... T>
-auto ezip(const T&... container) -> const_enumerated_zip_iterator<T...> {
+auto izip(const T&... container) -> const_enumerated_zip_iterator<T...> {
   return const_enumerated_zip_iterator<T...>(container...);
 }
 
 template <typename T>
-class enumerate_iterator {
+class indexed_iterator {
  public:
   // member typedefs provided through inheriting from std::iterator
   class iterator
@@ -521,7 +524,7 @@ class enumerate_iterator {
     }
   };
 
-  enumerate_iterator(T& container) : container(container) {}
+  indexed_iterator(T& container) : container(container) {}
 
   iterator begin() { return iterator(container.begin(), 0); }
 
@@ -532,7 +535,7 @@ class enumerate_iterator {
 };
 
 template <typename T>
-class const_enumerate_iterator {
+class const_indexed_iterator {
  public:
   // member typedefs provided through inheriting from std::iterator
   class iterator
@@ -563,7 +566,7 @@ class const_enumerate_iterator {
     }
   };
 
-  const_enumerate_iterator(const T& container) : container(container) {}
+  const_indexed_iterator(const T& container) : container(container) {}
 
   iterator begin() { return iterator(container.cbegin(), 0); }
 
@@ -574,13 +577,13 @@ class const_enumerate_iterator {
 };
 
 template <typename T>
-auto enumerate(T& container) -> enumerate_iterator<T> {
-  return enumerate_iterator<T>(container);
+auto indexed(T& container) -> indexed_iterator<T> {
+  return indexed_iterator<T>(container);
 }
 
 template <typename T>
-auto enumerate(const T& container) -> const_enumerate_iterator<T> {
-  return const_enumerate_iterator<T>(container);
+auto indexed(const T& container) -> const_indexed_iterator<T> {
+  return const_indexed_iterator<T>(container);
 }
 
 template <class TupType, size_t... I>
