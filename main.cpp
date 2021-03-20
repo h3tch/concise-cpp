@@ -68,8 +68,8 @@ auto main() -> int {
   val uniqueValues = hset{1, 2, 3};
   val basicMap = hmap<str, i32>{{"k0", 0}, {"k1", 1}, {"k2", 2}};
   val listi = arr{1, 2, 3};
-  val listj = arr{1, 2, 3};
-  val listk = vec{1, 2, 3};
+  val listj = arr{11, 22, 33};
+  val listk = vec{111, 222, 333};
   val string = "This is a string"s;
 
   val s2 = 123s;
