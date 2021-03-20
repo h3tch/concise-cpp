@@ -1,4 +1,5 @@
 #pragma once
+#pragma GCC diagnostic error "-Wswitch"
 #include <assert.h>
 #include <inttypes.h>
 
@@ -31,8 +32,8 @@
 #define expl explicit
 #define impl implicit
 #define noex noexcpet
-#define decl decltype
-#define cexpr constexpr
+#define eval decltype
+#define sub constexpr
 #define null nullptr
 #define inl inline
 

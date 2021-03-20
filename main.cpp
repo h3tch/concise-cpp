@@ -2,15 +2,15 @@
 
 namespace {
 
-template <tn T>
-auto inl add(fix T& a, fix T& b) -> T {
+template <tn T, tn U>
+auto inl add(fix T& a, fix U& b) -> eval(a + b) {
   val c = a + b;
   return c;
 }
 
 }  // namespace
 
-auto cexpr addi(fix i32 a, fix i32 b) -> i32 { return a + b; }
+auto sub addi(fix i32 a, fix i32 b) -> i32 { return a + b; }
 
 class Class {
  private:
@@ -31,26 +31,26 @@ class Class {
 
   auto dyn method() fix -> i32 { return c; }
 
-  auto dyn pureVirtual() fix -> f32 = 0;
+  auto dyn pure_virtual() fix -> f32 = 0;
 };
 
 class Derived : public Class {
  public:
   expl Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
 
-  auto method() fix -> i32 override final { return 64; }
+  auto method() fix -> i32 final override { return 64; }
 
-  auto pureVirtual() fix -> f32 override final { return 128f; }
+  auto pure_virtual() fix -> f32 final override { return 128f; }
 };
 
 auto main() -> int {
-  var c = Derived{1, 2, 5};
-  val a = c.a;
-  val b = c.b;
-  c.b = 3;
-  val d = c.b;
-  decl(d)::type e = 6;
-  var& c2 = dcast<Class&>(c);
+  var obj = Derived{1, 2, 5}; // a = 1, b = 2, c = 5
+  val a = obj.a;
+  val b = obj.b;
+  obj.b = 3; // will set b = 3 - c
+  val d = obj.b;
+  eval(d)::type e = 6;
+  var& dcast_obj = dcast<Class&>(obj);
 
   val p = uptr<int>(123);
   val q = sptr<int>(234);
@@ -58,9 +58,11 @@ auto main() -> int {
   val [s, t] = tup{arr{1, 2}, vec{3, 4}};
 
   if (d == 2)
+    return addi(1, d);
+  else if (d >= 3)
+    return add(0, d);
+  else if (not (d == -2) and d < 0)
     return 1;
-  else if (d == 3)
-    return 0;
   else
     println("Continue");
 
@@ -73,10 +75,8 @@ auto main() -> int {
   val string = "This is a string"s;
 
   val s2 = 123s;
-
   val i1 = 123i;
   val i2 = 123l;
-
   val f1 = 123f;
   val f2 = 123.0f;
   val f3 = 354'123.0;
@@ -111,8 +111,21 @@ auto main() -> int {
         }
       },
       d);
-    
+
   println("d as string: ", d, " -> ", d_string);
+
+  enum EnumSwitch { test_a, test_b };
+
+  val enum_value = EnumSwitch::test_a;
+
+  switch (enum_value) {
+    case test_a:
+      println("test_a");
+      break;
+    case test_b:
+      println("test_b");
+      break;
+  }
 
   return 0;
 }
