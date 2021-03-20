@@ -36,11 +36,11 @@ class Class {
 
 class Derived : public Class {
  public:
-  exp Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
+  expl Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
 
-  auto method() fix -> i32 final { return 64; }
+  auto method() fix -> i32 override final { return 64; }
 
-  auto pureVirtual() fix -> f32 final { return 128f; }
+  auto pureVirtual() fix -> f32 override final { return 128f; }
 };
 
 auto main() -> int {
@@ -90,10 +90,29 @@ auto main() -> int {
   println("Vector: ", listk);
   println("Nested: ", tup{arr{1, 2, 3}, vec{4, 5, 6}});
 
-  for (val[i, j, k] : zip(listi, listj, listk)) println(i, ", ", j, ", ", k);
+  for (val[i, j, k] : zip(listi, listj, listk))
+    println(i, ", ", j, ", ", k);
 
-  for (val[pos, i, j, k] : ezip(listi, listj, listk))
+  for (val[pos, i, j, k] : izip(listi, listj, listk))
     println("At position ", pos, ": ", i, ", ", j, ", ", k);
+
+  for (val[pos, i] : indexed(listi))
+    println("Enumerate position ", pos, ": ", i);
+
+  val d_string = std::invoke(
+      [](val& a) {
+        switch (a) {
+          case 1:
+            return "one";
+          case 2:
+            return "tow";
+          default:
+            return "unknown";
+        }
+      },
+      d);
+    
+  println("d as string: ", d, " -> ", d_string);
 
   return 0;
 }

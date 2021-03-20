@@ -4,6 +4,7 @@
 
 #include <array>
 #include <exception>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -27,8 +28,8 @@
 #define cast static_cast
 #define dcast dynamic_cast
 #define rcast reinterpret_cast
-#define exp explicit
-#define imp implicit
+#define expl explicit
+#define impl implicit
 #define noex noexcpet
 #define decl decltype
 #define cexpr constexpr
@@ -206,13 +207,13 @@ class zip_iterator {
     }
   };
 
-  zip_iterator(T&... containter)
-      : containters(std::forward_as_tuple(containter...)) {
+  zip_iterator(T&... container)
+      : containers(std::forward_as_tuple(container...)) {
     static_assert(sizeof...(T) > 0,
                   "At least one container is required for zipping.");
     const auto all_equal = [](auto const& c0, auto const&... c) {
       return ((c0.size() == c.size()) && ...);
-    }(containter...);
+    }(container...);
     if (not all_equal)
       throw std::invalid_argument(
           "All containers need to have the same size for zipping.");
@@ -221,17 +222,17 @@ class zip_iterator {
   iterator begin() {
     return std::apply(
         [](auto&... container) { return iterator(container.begin()...); },
-        containters);
+        containers);
   }
 
   iterator end() {
     return std::apply(
         [](auto&... container) { return iterator(container.end()...); },
-        containters);
+        containers);
   }
 
  private:
-  std::tuple<T&...> containters;
+  std::tuple<T&...> containers;
 };
 
 template <typename... T>
@@ -277,13 +278,13 @@ class const_zip_iterator {
     }
   };
 
-  const_zip_iterator(const T&... containter)
-      : containters(std::forward_as_tuple(containter...)) {
+  const_zip_iterator(const T&... container)
+      : containers(std::forward_as_tuple(container...)) {
     static_assert(sizeof...(T) > 0,
                   "At least one container is required for zipping.");
     const auto all_equal = [](auto const& c0, auto const&... c) {
       return ((c0.size() == c.size()) && ...);
-    }(containter...);
+    }(container...);
     if (not all_equal)
       throw std::invalid_argument(
           "All containers need to have the same size for zipping.");
@@ -292,31 +293,31 @@ class const_zip_iterator {
   iterator begin() {
     return std::apply(
         [](auto&... container) { return iterator(container.cbegin()...); },
-        containters);
+        containers);
   }
 
   iterator end() {
     return std::apply(
         [](auto&... container) { return iterator(container.cend()...); },
-        containters);
+        containers);
   }
 
  private:
-  std::tuple<const T&...> containters;
+  std::tuple<const T&...> containers;
 };
 
 template <typename... T>
-auto zip(T&... containter) -> zip_iterator<T...> {
-  return zip_iterator<T...>(containter...);
+auto zip(T&... container) -> zip_iterator<T...> {
+  return zip_iterator<T...>(container...);
 }
 
 template <typename... T>
-auto zip(const T&... containter) -> const_zip_iterator<T...> {
-  return const_zip_iterator<T...>(containter...);
+auto zip(const T&... container) -> const_zip_iterator<T...> {
+  return const_zip_iterator<T...>(container...);
 }
 
 template <typename... T>
-class enumerated_zip_iterator {
+class indexed_zip_iterator {
  public:
   // member typedefs provided through inheriting from std::iterator
   class iterator
@@ -362,13 +363,13 @@ class enumerated_zip_iterator {
     }
   };
 
-  enumerated_zip_iterator(T&... containter)
-      : containters(std::forward_as_tuple(containter...)) {
+  indexed_zip_iterator(T&... container)
+      : containers(std::forward_as_tuple(container...)) {
     static_assert(sizeof...(T) > 0,
                   "At least one container is required for zipping.");
     const auto all_equal = [](auto const& c0, auto const&... c) {
       return ((c0.size() == c.size()) && ...);
-    }(containter...);
+    }(container...);
     if (not all_equal)
       throw std::invalid_argument(
           "All containers need to have the same size for zipping.");
@@ -379,24 +380,24 @@ class enumerated_zip_iterator {
         [](auto&... container) {
           return iterator(size_t{0}, container.begin()...);
         },
-        containters);
+        containers);
   }
 
   iterator end() {
-    const auto end_position = std::get<0>(containters).size();
+    const auto end_position = std::get<0>(containers).size();
     return std::apply(
         [end_position](auto&... container) {
           return iterator(end_position, container.end()...);
         },
-        containters);
+        containers);
   }
 
  private:
-  std::tuple<T&...> containters;
+  std::tuple<T&...> containers;
 };
 
 template <typename... T>
-class const_enumerated_zip_iterator {
+class const_indexed_zip_iterator {
  public:
   // member typedefs provided through inheriting from std::iterator
   class iterator
@@ -445,13 +446,13 @@ class const_enumerated_zip_iterator {
     }
   };
 
-  const_enumerated_zip_iterator(const T&... containter)
-      : containters(std::forward_as_tuple(containter...)) {
+  const_indexed_zip_iterator(const T&... container)
+      : containers(std::forward_as_tuple(container...)) {
     static_assert(sizeof...(T) > 0,
                   "At least one container is required for zipping.");
     const auto all_equal = [](auto const& c0, auto const&... c) {
       return ((c0.size() == c.size()) && ...);
-    }(containter...);
+    }(container...);
     if (not all_equal)
       throw std::invalid_argument(
           "All containers need to have the same size for zipping.");
@@ -462,30 +463,124 @@ class const_enumerated_zip_iterator {
         [](auto&... container) {
           return iterator(size_t{0}, container.cbegin()...);
         },
-        containters);
+        containers);
   }
 
   iterator end() {
-    const auto end_position = std::get<0>(containters).size();
+    const auto end_position = std::get<0>(containers).size();
     return std::apply(
         [end_position](auto&... container) {
           return iterator(end_position, container.cend()...);
         },
-        containters);
+        containers);
   }
 
  private:
-  std::tuple<const T&...> containters;
+  std::tuple<const T&...> containers;
 };
 
 template <typename... T>
-auto ezip(T&... containter) -> enumerated_zip_iterator<T...> {
-  return enumerated_zip_iterator<T...>(containter...);
+auto izip(T&... container) -> indexed_zip_iterator<T...> {
+  return indexed_zip_iterator<T...>(container...);
 }
 
 template <typename... T>
-auto ezip(const T&... containter) -> const_enumerated_zip_iterator<T...> {
-  return const_enumerated_zip_iterator<T...>(containter...);
+auto izip(const T&... container) -> const_indexed_zip_iterator<T...> {
+  return const_indexed_zip_iterator<T...>(container...);
+}
+
+template <typename T>
+class indexed_iterator {
+ public:
+  // member typedefs provided through inheriting from std::iterator
+  class iterator
+      : public std::iterator<
+            std::input_iterator_tag,                   // iterator_category
+            std::tuple<size_t, typename T::iterator>,  // value_type
+            std::tuple<size_t, typename T::iterator>,  // difference_type
+            const std::tuple<size_t, typename T::iterator>*,  // pointer
+            std::tuple<size_t, typename T::reference>         // reference
+            > {
+    typename T::iterator iter;
+    size_t position;
+
+   public:
+    explicit iterator(typename T::iterator iter, size_t position)
+        : iter(iter), position(position) {}
+
+    iterator& operator++() { return ++iter, ++position, *this; }
+
+    iterator operator++(int) { return iterator(std::next(iter), position + 1); }
+
+    bool operator==(const iterator& other) const { return iter == other.iter; }
+
+    bool operator!=(const iterator& other) const { return iter != other.iter; }
+
+    std::tuple<size_t, typename T::reference> operator*() {
+      return {position, *iter};
+    }
+  };
+
+  indexed_iterator(T& container) : container(container) {}
+
+  iterator begin() { return iterator(container.begin(), 0); }
+
+  iterator end() { return iterator(container.end(), container.size()); }
+
+ private:
+  T& container;
+};
+
+template <typename T>
+class const_indexed_iterator {
+ public:
+  // member typedefs provided through inheriting from std::iterator
+  class iterator
+      : public std::iterator<
+            std::input_iterator_tag,  // iterator_category
+            std::tuple<ssize_t, typename T::const_iterator>,  // value_type
+            std::tuple<ssize_t, typename T::const_iterator>,  // difference_type
+            const std::tuple<ssize_t, typename T::const_iterator>*,  // pointer
+            std::tuple<ssize_t, typename T::const_reference>  // reference
+            > {
+    typename T::const_iterator iter;
+    size_t position;
+
+   public:
+    explicit iterator(typename T::const_iterator iter, size_t position)
+        : iter(iter), position(position) {}
+
+    iterator& operator++() { return ++iter, ++position, *this; }
+
+    iterator operator++(int) { return iterator(std::next(iter), position + 1); }
+
+    bool operator==(const iterator& other) const { return iter == other.iter; }
+
+    bool operator!=(const iterator& other) const { return iter != other.iter; }
+
+    std::tuple<size_t, typename T::const_reference> operator*() {
+      return {position, *iter};
+    }
+  };
+
+  const_indexed_iterator(const T& container) : container(container) {}
+
+  iterator begin() { return iterator(container.cbegin(), 0); }
+
+  iterator end() { return iterator(container.cend(), container.size()); }
+
+ private:
+  const T& container;
+};
+
+template <typename T>
+auto indexed(T& container) -> indexed_iterator<T> {
+  return indexed_iterator<T>(container);
+}
+
+template <typename T>
+auto indexed(const T& container) -> const_indexed_iterator<T> {
+  return const_indexed_iterator<T>(container);
 }
 
 template <class TupType, size_t... I>
