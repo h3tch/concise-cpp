@@ -3,68 +3,74 @@
 namespace {
 
 template <tn T, tn U>
-auto inl add(fix T& a, fix U& b) -> eval(a + b) {
+fn inl add(fix T& a, fix U& b)->eval(a + b) {
   val c = a + b;
   return c;
 }
 
+fn inl def addi(fix i32 a, fix i32 b)->i32 { return a + b; }
+
 }  // namespace
 
-auto sub addi(fix i32 a, fix i32 b) -> i32 { return a + b; }
-
 class Class {
- private:
-  i32 c;
-
  public:
+  Class(fix i32 a_, fix i32 b_, fix i32 c_)
+      : a(me, a_, [](Class& self, fix i32& v) -> i32 { return v + self.c; }),
+        b(me, b_, [](Class& self, fix i32& v) -> i32 { return v - self.c; }),
+        c(c_) {}
+  dyn ~Class() {}
+
+  fn sta static_method()->i32 { return cast<i32>(32f); }
+  fn dyn method() fix->i32 { return c; }
+  fn dyn pure_virtual() fix->f32 = 0;
+
   getter<Class, i32> a;
   getset<Class, i32> b;
 
-  Class(fix i32 a_, fix i32 b_, fix i32 c_)
-      : a(me, a_,
-          [](Class& self, fix i32& v) -> fix i32 { return v + self.c; }),
-        b(me, b_,
-          [](Class& self, fix i32& v) -> fix i32 { return v - self.c; }),
-        c(c_) {}
-
-  auto sta static_method() -> i32 { return cast<i32>(32f); }
-
-  auto dyn method() fix -> i32 { return c; }
-
-  auto dyn pure_virtual() fix -> f32 = 0;
+ private:
+  i32 c;
 };
 
-class Derived : public Class {
+class Derived final : public Class {
  public:
   expl Derived(fix i32 a_, fix i32 b_, fix i32 c_) : Class(a_, b_, c_) {}
+  dyn ~Derived() {}
 
-  auto method() fix -> i32 final override { return 64; }
-
-  auto pure_virtual() fix -> f32 final override { return 128f; }
+  fn method() fix->i32 final override { return 64i; }
+  fn pure_virtual() fix->f32 final override { return 128f; }
 };
 
-auto main() -> int {
-  var obj = Derived{1, 2, 5}; // a = 1, b = 2, c = 5
+fn main()->int {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+  var obj = Derived{1, 2, 5};  // a = 1, b = 2, c = 5
   val a = obj.a;
   val b = obj.b;
-  obj.b = 3; // will set b = 3 - c
+  obj.b = 3;  // will set b = 3 - c
   val d = obj.b;
   eval(d)::type e = 6;
   var& dcast_obj = dcast<Class&>(obj);
 
   val p = uptr<int>(123);
   val q = sptr<int>(234);
-  val [m, n] = tup{1, 2};
-  val [s, t] = tup{arr{1, 2}, vec{3, 4}};
+  val[m, n] = tup{1, 2};
+  val[s, t] = tup{arr{1, 2}, vec{3, 4}};
 
   if (d == 2)
     return addi(1, d);
   else if (d >= 3)
     return add(0, d);
-  else if (not (d == -2) and d < 0)
+  else if (not(d == -2) and d < 0)
     return 1;
   else
     println("Continue");
+
+  def val expr = 5i;
+  if def (expr == addi(2i, 3i))
+    println("Expression is 5.");
+  else
+    println("Expression is not 5.");
 
   val tuple = tup{1i, 1.2l, "test"s};
   val uniqueValues = hset{1, 2, 3};
@@ -82,6 +88,7 @@ auto main() -> int {
   val f3 = 354'123.0;
   val f4 = 123.0l;
   val position = 123z;
+#pragma GCC diagnostic pop
 
   println("Tuple: ", tuple);
   println("Set: ", uniqueValues);
@@ -90,8 +97,7 @@ auto main() -> int {
   println("Vector: ", listk);
   println("Nested: ", tup{arr{1, 2, 3}, vec{4, 5, 6}});
 
-  for (val[i, j, k] : zip(listi, listj, listk))
-    println(i, ", ", j, ", ", k);
+  for (val[i, j, k] : zip(listi, listj, listk)) println(i, ", ", j, ", ", k);
 
   for (val[pos, i, j, k] : izip(listi, listj, listk))
     println("At position ", pos, ": ", i, ", ", j, ", ", k);
@@ -119,10 +125,10 @@ auto main() -> int {
   val enum_value = EnumSwitch::test_a;
 
   switch (enum_value) {
-    case test_a:
+    case EnumSwitch::test_a:
       println("test_a");
       break;
-    case test_b:
+    case EnumSwitch::test_b:
       println("test_b");
       break;
   }

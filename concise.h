@@ -1,5 +1,7 @@
 #pragma once
-#pragma GCC diagnostic error "-Wswitch"
+#pragma GCC diagnostic error "-Wall"
+#pragma GCC diagnostic error "-Wextra"
+
 #include <assert.h>
 #include <inttypes.h>
 
@@ -20,6 +22,7 @@
 #include <vector>
 
 #define tn typename
+#define fn auto
 #define var auto
 #define val const auto
 #define fix const
@@ -33,9 +36,10 @@
 #define impl implicit
 #define noex noexcpet
 #define eval decltype
-#define sub constexpr
+#define def constexpr
 #define null nullptr
 #define inl inline
+#define enum enum class
 
 using i8 = int8_t;
 using i16 = int16_t;
@@ -73,14 +77,14 @@ using LogicError = std::logic_error;
 // clang-format off
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wliteral-suffix"
-int8_t      operator "" b (unsigned long long v) { return (int8_t)v; }
-int16_t     operator "" s (unsigned long long v) { return (int16_t)v; }
-int32_t     operator "" i (unsigned long long v) { return (int32_t)v; }
-uint8_t     operator "" ub(unsigned long long v) { return (uint8_t)v; }
-uint16_t    operator "" us(unsigned long long v) { return (uint16_t)v; }
-uint32_t    operator "" ui(unsigned long long v) { return (uint32_t)v; }
-size_t      operator "" z (unsigned long long v) { return (size_t)v; }
-float       operator "" f (unsigned long long v) { return (float)v; }
+constexpr int8_t      operator "" b (unsigned long long v) { return (int8_t)v; }
+constexpr int16_t     operator "" s (unsigned long long v) { return (int16_t)v; }
+constexpr int32_t     operator "" i (unsigned long long v) { return (int32_t)v; }
+constexpr uint8_t     operator "" ub(unsigned long long v) { return (uint8_t)v; }
+constexpr uint16_t    operator "" us(unsigned long long v) { return (uint16_t)v; }
+constexpr uint32_t    operator "" ui(unsigned long long v) { return (uint32_t)v; }
+constexpr size_t      operator "" z (unsigned long long v) { return (size_t)v; }
+constexpr float       operator "" f (unsigned long long v) { return (float)v; }
 std::string operator "" s (const char* s, std::size_t n) { return std::string{s, n}; }
 static_assert(sizeof(1b) == 1);
 static_assert(sizeof(1s) == 2);
@@ -97,20 +101,20 @@ static_assert(sizeof(1.0l) == 16);
 
 template <typename Class, typename T>
 class getter final {
-  typedef const T (*func)(Class&, const T&);
+  typedef T (*func)(Class&, const T&);
   typedef void (*delfunc)(Class&, T&);
 
  public:
   explicit getter(
       Class& owner, const T value,
-      const func getter = [](Class&, const T& value) -> const T {
+      const func getter = [](Class&, const T& value) -> T {
         return value;
       },
-      const delfunc deleter = [](Class&, T& value) {})
+      const delfunc deleter = [](Class&, T&) {})
       : v{value}, c{owner}, g{getter}, d{deleter} {}
   explicit getter(
       Class& owner, const T* value,
-      const func getter = [](Class&, const T& value) -> const T {
+      const func getter = [](Class&, const T& value) -> T {
         return value;
       },
       const delfunc deleter = [](Class&, T& value) {})
@@ -129,26 +133,26 @@ class getter final {
 
 template <typename Class, typename T>
 class getset final {
-  typedef const T (*func)(Class&, const T&);
+  typedef T (*func)(Class&, const T&);
   typedef void (*delfunc)(Class&, T&);
 
  public:
   explicit getset(
       Class& owner, const T value,
-      const func setter = [](Class&, const T& value) -> const T {
+      const func setter = [](Class&, const T& value) -> T {
         return value;
       },
-      const func getter = [](Class&, const T& value) -> const T {
+      const func getter = [](Class&, const T& value) -> T {
         return value;
       },
-      const delfunc deleter = [](Class&, T& value) {})
+      const delfunc deleter = [](Class&, T&) {})
       : v{value}, c{owner}, g{getter}, s{setter}, d{deleter} {}
   explicit getset(
       Class& owner, const T* value,
-      const func setter = [](Class&, const T& value) -> const T {
+      const func setter = [](Class&, const T& value) -> T {
         return value;
       },
-      const func getter = [](Class&, const T& value) -> const T {
+      const func getter = [](Class&, const T& value) -> T {
         return value;
       },
       const delfunc deleter = [](Class&, T& value) {})
